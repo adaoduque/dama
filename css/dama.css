@@ -1,0 +1,26 @@
+html, body {
+	min-height: 100% !important;
+	max-height: 100% !important;
+	height: 100% !important;
+}
+
+.container {
+	background-color: #CDCDCD !important;
+	min-height: 100%;
+	max-height: 100%;
+	padding: 0px !important;
+}
+
+.area1 {
+	background-color: #FFFFFF;
+	float: left;
+}
+
+.area2 {
+	background-color: #000000;
+	float: left;
+}
+
+.parts {
+    display: table;
+}
