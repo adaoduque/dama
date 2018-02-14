@@ -23,4 +23,11 @@ html, body {
 
 .parts {
     display: table;
+    border: 1px solid;
+    margin: 0 auto;
+}
+
+.bingo {
+	border: 1px solid #09f2c3;
+	background-color: #09f2c3;
 }
