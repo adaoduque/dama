@@ -141,10 +141,15 @@
 	            e.preventDefault();
 			}).on( 'mouseup', function () {
             	var $drop  =  $( '.bingo' );
-            	$drop.append( $( this ).css({ 'z-index' : 100 }) );
-            	$( this ).css({ 'left' : '0px', 'top' : '0px' })
+				var $e     =  $( this );
+            	$drop.append( $e.css({ 'z-index' : 100 }) );
+				$e.css({ 'left' : '0px', 'top' : '0px' }).addClass("animation");
       			$drop.removeClass( 'bingo' );
 				dragging  =  true;
+				
+				setTimeout( function () {
+					$e.removeClass( "animation" );
+				}, 800);
             });
 
         }
@@ -170,4 +175,4 @@
 	        });
     	};
 
-})( jQuery );    
+})( jQuery );
