@@ -2,16 +2,16 @@
 <br />
 Um game de dama controlado por uma inteligência artificial.<br/>
 
-## Status do projeto:
+## Funcionalidades do game:
 
-> <font color="red">Desenhar tabuleiro dinamicamente por quantidade de peças que o usuário quer jogar</font><br/>
-> <font color="red">Suportar drag and drop das peças</font><br/>
-> <font color="red">Função de comer a peça do oponente (Comer para frente)</font><br/>
-> <font color="red">Função de comer múltiplas peças do oponente (Se possível)</font><br/>
-> <font color="red">Suportar damas (Quando a peça chegar na primeira linha de casas do oponente)</font><br/>
-> <font color="red">Damas andam qualquer quantidade de casas (Linha reta)</font><br/>
-> <font color="red">Damas comem peças</font><br/>
-> <font color="red">Adicionar inteligência Artificial para jogar</font><br/>
+> Desenhar tabuleiro dinamicamente por quantidade de peças que o usuário quer jogar:white_check_mark:<br/>
+> Suportar drag and drop das peças:white_check_mark:<br/>
+> Função de comer a peça do oponente (Comer para frente):no_entry_sign:<br/>
+> Função de comer múltiplas peças do oponente (Se possível):no_entry_sign:<br/>
+> Suportar damas (Quando a peça chegar na primeira linha de casas do oponente):no_entry_sign:<br/>
+> Damas andam qualquer quantidade de casas (Linha reta):no_entry_sign:<br/>
+> Damas comem peças:no_entry_sign:<br/>
+> Adicionar inteligência Artificial para jogar:no_entry_sign:<br/>
 
 <br />
 <br />
