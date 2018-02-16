@@ -7,7 +7,9 @@
         this.$element.addClass("container");
         this.$element.width( this.$element.height() )
         this.wParts    =  0;
-        this.hParts    =  0;
+		this.hParts    =  0;
+		this.wGrid     =  [];
+		this.hGrid     =  [];
         this.center    =  0;
         this.dragging  =  false;
     };	
@@ -30,23 +32,38 @@
         	this.wParts  =  this.$element.width() / parts;
         	this.hParts  =  this.$element.height() / parts;
 
-        	//var d = $( '<div />' ).attr({ 'class' : 'area' }).css({ 'z-index' : -99999, 'width' : this.$element.width(), 'height' : this.$element.height(), 'position' : 'absolute' });
-        	//this.$element.append( d )
+			for (var i = 0; i < parts; i++) {
+				this.wGrid[i]  =  i+1;
+				this.hGrid[i]  =  i+1;
+			}
 
-        	var j = 0;
+			console.log(this.wGrid )
+
+			var j = 0;
+			var k = 0;
+			var l = 0;
         	for( var i=0; i < tParts; i++) {
         		
-        		if( i > 0)
-        			color  =  color == 'area2' ? 'area1' : 'area2';
+        		if( i > 0) { color  =  color == 'area2' ? 'area1' : 'area2'; }
 
         		if( j == parts) {
         			color  =  color == 'area2' ? 'area1' : 'area2';
-        			j  =  0;
+					j  =  0;
         		}
 
-        		var $div  =  $( '<div />' ).addClass( color ).attr({ 'index' : i }).css({ 'width' : this.wParts, 'height' : this.hParts});
-        		this.$element.append( $div );
-        		j++;
+				var $div = $('<div />').addClass(color).attr({ 'index': i, 'h': this.hGrid[l], 'w': this.wGrid[k] }).css({ 'width' : this.wParts, 'height' : this.hParts});
+
+				this.$element.append($div);
+
+				j++;
+				k++;				
+				
+				if (k >= parts) {
+					k = 0;
+					l++;
+				}			
+
+				
         	}
         },
         drawParts : function () {
@@ -66,14 +83,12 @@
 
         	this.$element.find( 'div.area2' ).each( function () {
         		if( nParts > i ) {
-        			var $parts  =  $( '<div />' ).addClass( 'parts' ).attr({ 'locked' : true }).css({ 'z-index' : 100, 'margin-top' : center , 'border-color' : colorOne, 'background-color' : colorOne, 'border-radius' : radius, 'height' : height - minor, 'width' : height - minor });
+        			var $parts  =  $( '<div />' ).addClass( 'parts' ).attr({ 'b' : 1, 'locked' : true }).css({ 'z-index' : 100, 'margin-top' : center , 'border-color' : colorOne, 'background-color' : colorOne, 'border-radius' : radius, 'height' : height - minor, 'width' : height - minor });
         			$( this ).append( $parts );
-        			//_Dama.dragDrop( $parts );
         		}else {
         			if( j >= ignore ) {
-	        			var $parts  =  $( '<div />' ).addClass( 'parts' ).attr({ 'locked' : true }).css({ 'z-index' : 100, 'margin-top' : center , 'border-color' : colorTwo, 'background-color' : colorTwo, 'border-radius' : radius, 'height' : height - minor, 'width' : height - minor });
+	        			var $parts  =  $( '<div />' ).addClass( 'parts' ).attr({ 'b' : 2, 'locked' : true }).css({ 'z-index' : 100, 'margin-top' : center , 'border-color' : colorTwo, 'background-color' : colorTwo, 'border-radius' : radius, 'height' : height - minor, 'width' : height - minor });
 	        			$( this ).append( $parts );
-	        			//_Dama.dragDrop( $parts );
         			}
         			j++;
         		}
@@ -85,9 +100,9 @@
         	var dragging  =  this.dragging;
         	var height    =  this.hParts
         	var width     =  this.wParts
-        	var center    =  this.center;
+			var center    =  this.center;
         	$( 'div.parts' ).on( 'mousedown', function ( e ) {
-        		var d        =   $( this ).css({ 'z-index' : 200 });
+				var d        =   $( this ).css({ 'z-index' : 200 });
 
                 var drg_w  =  d.outerWidth();
                 var pos_x  =  d.offset().left + drg_w - e.pageX;
@@ -140,9 +155,32 @@
 	            })
 	            e.preventDefault();
 			}).on( 'mouseup', function () {
-            	var $drop  =  $( '.bingo' );
-				var $e     =  $( this );
-            	$drop.append( $e.css({ 'z-index' : 100 }) );
+
+				var $drop   =  $('.bingo');
+				var append  =  false;
+				var $e      =  $(this);
+
+				var ih   =  parseInt( $e.parent().attr('h') );
+				var iw   =  parseInt( $e.parent().attr('w') );
+				var b    =  $e.attr( 'b' );
+
+				var nih      =  parseInt( $drop.attr('h') );
+				var niw      =  parseInt( $drop.attr('w') );		
+
+				if ( b == 1 && nih == ( ih + 1) ) {					
+					if (niw - iw == 1 || niw - iw == -1 ) {
+						append  =  true;
+					}
+				} else if (b == 2 && nih == (ih - 1)) {
+					if (niw - iw == 1 || niw - iw == -1) {
+						append = true;
+					}
+				}
+
+				if ( append ) {
+					$drop.append($e.css({ 'z-index': 100 }));
+				}
+            	
 				$e.css({ 'left' : '0px', 'top' : '0px' }).addClass("animation");
       			$drop.removeClass( 'bingo' );
 				dragging  =  true;
