@@ -37,7 +37,7 @@
 				this.hGrid[i]  =  i+1;
 			}
 
-			console.log(this.wGrid )
+			//console.log(this.wGrid )
 
 			var j = 0;
 			var k = 0;
@@ -51,7 +51,7 @@
 					j  =  0;
         		}
 
-				var $div = $('<div />').addClass(color).attr({ 'index': i, 'h': this.hGrid[l], 'w': this.wGrid[k] }).css({ 'width' : this.wParts, 'height' : this.hParts});
+				var $div = $('<div />').addClass(color).addClass( 'area' ).attr({ 'index': i, 'h': this.hGrid[l], 'w': this.wGrid[k] }).css({ 'width' : this.wParts, 'height' : this.hParts});
 
 				this.$element.append($div);
 
@@ -165,7 +165,14 @@
 				var b    =  $e.attr( 'b' );
 
 				var nih      =  parseInt( $drop.attr('h') );
-				var niw      =  parseInt( $drop.attr('w') );		
+				var niw      =  parseInt( $drop.attr('w') );
+
+				//console.log("IH: " + ih);
+				//console.log("IW: " + iw);
+
+				//console.log("NIH: " + nih);
+				//console.log("NIW: " + niw);
+
 
 				if ( b == 1 && nih == ( ih + 1) ) {					
 					if (niw - iw == 1 || niw - iw == -1 ) {
@@ -175,7 +182,30 @@
 					if (niw - iw == 1 || niw - iw == -1) {
 						append = true;
 					}
+				}else if( b == 2 && nih == (ih - 2) ) {
+
+					if( iw < niw )
+						var $div =  $( '.area[w='+(niw-1)+'][h='+(nih+1)+'] > .parts[b=1]' );
+					else
+						var $div =  $( '.area[w='+(niw+1)+'][h='+(nih+1)+'] > .parts[b=1]' );
+
+					if( $div.length > 0 ) {
+						$div.remove();
+						append  =  true;
+					}
+				}else if( b == 1 && nih == (ih + 2) ) {
+
+					if( iw < niw )
+						var $div =  $( '.area[w='+(niw-1)+'][h='+(nih-1)+'] > .parts[b=2]' );
+					else
+						var $div =  $( '.area[w='+(niw+1)+'][h='+(nih-1)+'] > .parts[b=2]' );
+
+					if( $div.length > 0 ) {
+						$div.remove();
+						append  =  true;
+					}
 				}
+
 
 				if ( append ) {
 					$drop.append($e.css({ 'z-index': 100 }));
