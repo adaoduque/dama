@@ -12,7 +12,11 @@
 		this.hGrid     =  [];
         this.center    =  0;
         this.dragging  =  false;
-    };	
+	};
+	
+	function onlyUnique(value, index, self) {
+		return self.indexOf(value) === index;
+	}
 
     Dama.VERSION   =   '1.0.0';
 
@@ -101,8 +105,15 @@
         	var height    =  this.hParts
         	var width     =  this.wParts
 			var center    =  this.center;
-        	$( 'div.parts' ).on( 'mousedown', function ( e ) {
-				var d        =   $( this ).css({ 'z-index' : 200 });
+			var ahahah    =  { 'h' : [], 'w' : []};
+			var d         =  '';
+
+			$('div.parts').off('mousedown').on( 'mousedown', function ( e ) {
+				ahahah.h = [];
+				ahahah.w = [];			
+				d        =   $( this ).css({ 'z-index' : 200 });
+
+				var type   =  d.attr("b");
 
                 var drg_w  =  d.outerWidth();
                 var pos_x  =  d.offset().left + drg_w - e.pageX;
@@ -110,10 +121,9 @@
 
         		dragging     =   true;
         		d.attr({ "locked" : 0 });        		
-	            $( document ).on( 'mousemove', function ( i ) { 	            	
+				$(document).on( 'mousemove', function ( i ) {
+
 	            	if( dragging && d.attr( "locked" ) == 0 ) {
-
-
 	            		var left  =  i.pageX + pos_x - drg_w;
 	            		var top   =  i.pageY + pos_y - drg_w;
 				        $( d ).offset({
@@ -121,44 +131,83 @@
 				            'left' : left
 				        });
 
-				        $("body").find('div.area2').not( d ).each(function() {
-
+				        $("body").find('div.area2').each(function() {						
 				        	var p  =  $( this ).find( '.parts' );
+				        	var l  =  ahahah.h.length;
 
-				        	if( p.length < 1 ) {
+                        	var dTop   =  $( this ).offset().top;
+                        	var dLeft  =  $( this ).offset().left;
 
-	                        	var dTop   =  $( this ).offset().top;
-	                        	var dLeft  =  $( this ).offset().left;
+                        	var dHeight  =  $( this ).height();
+                        	var dWidth   =  $( this ).width();	   
 
-	                        	var dHeight  =  $( this ).height();
-	                        	var dWidth   =  $( this ).width();
-
+				        	if( p.length < 1 ) {                   
 	                        	if( dLeft < left && ( dLeft + width ) < (left + width) && left - dLeft < dWidth ) {
-
-	                        		if( dTop < top && ( top - dTop ) < dHeight ) {
-										$( this ).addClass("bingo")
+	                        		l  -= 1;
+	                        		if( dTop < top && ( top - dTop ) < dHeight ) {										
+										if (ahahah.h[l] != $(this).attr('h') && ahahah.w[l] != $(this).attr('w') ) {
+											ahahah.h.push( parseInt( $(this).attr('h') ) );
+											ahahah.w.push( parseInt( $(this).attr('w') ) );
+										}
+										$( this ).addClass("bingo");
 	                        		}else {
-	                        			$( this ).removeClass("bingo")
+	                        			$( this ).removeClass("bingo");
 	                        		}
 	                        	}else {
 	                        		$( this ).removeClass("bingo")
 	                        	}
 
-	                        }
+	                        }else if( l > 2 && type == 2 && p.attr( "b" ) == 2 && p.attr( "h" ) == d.attr( "h" ) && p.attr( "w" ) == d.attr( "w" ) ) {
+                        		if( dLeft < left && ( dLeft + width ) < (left + width) && left - dLeft < dWidth ) {
+                        			console.log("SIMMMM  2")
+	                        		if( dTop < top && ( top - dTop ) < dHeight ) {
+										if (ahahah.h[l] != $(this).attr('h') && ahahah.w[l] != $(this).attr('w') ) {
+											ahahah.h.push( parseInt( $(this).attr('h') ) );
+											ahahah.w.push( parseInt( $(this).attr('w') ) );
+										}	                        			
+										$( this ).addClass("bingo");
+	                        		}else {
+	                        			$( this ).removeClass("bingo");
+	                        		}
+                        		}                  		
+                        	}else if( l > 2 && type == 1 && p.attr( "b" ) == 1 && p.attr( "h" ) == d.attr( "h" ) && p.attr( "w" ) == d.attr( "w" ) ) {
+                        		if( dLeft < left && ( dLeft + width ) < (left + width) && left - dLeft < dWidth ) {
+                        			console.log("SIMMMM  2")
+	                        		if( dTop < top && ( top - dTop ) < dHeight ) {
+										if (ahahah.h[l] != $(this).attr('h') && ahahah.w[l] != $(this).attr('w') ) {
+											ahahah.h.push( parseInt( $(this).attr('h') ) );
+											ahahah.w.push( parseInt( $(this).attr('w') ) );
+										}	                        			
+										$( this ).addClass("bingo");
+	                        		}else {
+	                        			$( this ).removeClass("bingo");
+	                        		}
+                        		}                  		
+                        	}
+
+                        	//console.log( "QTD: ", ahahah.h.length );
 
 				        });
 
  				    }
 	            }).on( 'mouseup', function (e) {
 	            	dragging  = true;
-	            	d.attr({ "locked" : true });
+					d.attr({ "locked" : true });
+					$(document).off('mousemove');
+					$(document).off('mouseup');
 	            })
 	            e.preventDefault();
-			}).on( 'mouseup', function () {
+			}).off('mouseup').on( 'mouseup', function () {
+
+				var $e = $(this);
+				var toDelete  =  [];
+				console.log( ahahah );
+				//console.log( ahahah.h.filter( onlyUnique ) );
+				//console.log(ahahah.w.filter(onlyUnique));
 
 				var $drop   =  $('.bingo');
 				var append  =  false;
-				var $e      =  $(this);
+				
 
 				var ih   =  parseInt( $e.parent().attr('h') );
 				var iw   =  parseInt( $e.parent().attr('w') );
@@ -174,15 +223,15 @@
 				//console.log("NIW: " + niw);
 
 
-				if ( b == 1 && nih == ( ih + 1) ) {					
+				if ( b == 1 && nih == ( ih + 1) && ahahah.h.length <= 2 ) {				
 					if (niw - iw == 1 || niw - iw == -1 ) {
 						append  =  true;
 					}
-				} else if (b == 2 && nih == (ih - 1)) {
+				} else if (b == 2 && nih == (ih - 1)  && ahahah.h.length <= 2) {
 					if (niw - iw == 1 || niw - iw == -1) {
 						append = true;
 					}
-				}else if( b == 2 && nih == (ih - 2) ) {
+				}else if( b == 2 && nih == (ih - 2)  && ahahah.h.length <= 2 ) {
 
 					if( iw < niw )
 						var $div =  $( '.area[w='+(niw-1)+'][h='+(nih+1)+'] > .parts[b=1]' );
@@ -193,7 +242,7 @@
 						$div.remove();
 						append  =  true;
 					}
-				}else if( b == 1 && nih == (ih + 2) ) {
+				}else if( b == 1 && nih == (ih + 2) && ahahah.h.length <= 2 ) {
 
 					if( iw < niw )
 						var $div =  $( '.area[w='+(niw-1)+'][h='+(nih-1)+'] > .parts[b=2]' );
@@ -204,8 +253,121 @@
 						$div.remove();
 						append  =  true;
 					}
+				
+				}else if( b == 1 ) {
+					
+
+					for( var i = 0; i < ahahah.h.length; i++) {
+						if( ahahah.h[i] == (ih+2) && i == 0 ) {
+							if( iw < ahahah.w[i] )
+								toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
+							else
+								toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
+
+							if( $( toDelete[i] ).length > 0 ) {
+								append  =  true;
+							}else {
+								append  =  false;
+								break;
+							}
+
+						}else {
+
+							var j = i-1;
+
+							console.log( "SUM: " + ahahah.h[i] + " " + (ahahah.h[j]+2) );
+
+							if( ahahah.h[i] == (ahahah.h[j]+2) ) {
+								if( ahahah.w[j] < ahahah.w[i] )
+									toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
+								else
+									toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
+
+								if( $( toDelete[i] ).length > 0 ) {
+									append  =  true;
+								}else {
+									append  =  false;
+									break;
+								}
+							}else if( ahahah.h[j] == (ahahah.h[i] + 2) ) {								
+
+								if( ahahah.w[j] < ahahah.w[i] )
+									toDelete[i]  =  '.area[w='+(ahahah.w[j]+1)+'][h='+(ahahah.h[j]-1)+'] > .parts[b=2]';
+								else
+									toDelete[i]  =  '.area[w='+(ahahah.w[j]-1)+'][h='+(ahahah.h[j]-1)+'] > .parts[b=2]';
+
+								if( $( toDelete[i] ).length > 0 ) {
+									append  =  true;
+								}else {
+									append  =  false;
+									break;
+								}
+
+							}
+
+						}
+
+					}
+
+				}else if( b == 2 ) {			
+
+					for( var i = 0; i < ahahah.h.length; i++) {
+						if( ahahah.h[i] == (ih-2) && i == 0 ) {
+							if( iw < ahahah.w[i] ){
+								toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
+								//console.log("MENOR");
+							}
+							else{
+								toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
+								//console.log("MAIOR");
+							}
+
+							if( $( toDelete[i] ).length > 0 ) {
+								append  =  true;
+							}else {
+								append  =  false;
+								//console.log("NÃOOOO" + ( '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=1]' ));
+								break;
+							}
+						}else {
+							var j = i-1;
+
+							if( ahahah.h[i] == (ahahah.h[j]-2) ) {
+								if( ahahah.w[j] < ahahah.w[i] )
+									toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
+								else
+									toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
+
+								if( $( toDelete[i] ).length > 0 ) {
+									append  =  true;
+								}else {
+									append  =  false;
+									break;
+								}
+							}else if( ahahah.h[j] == (ahahah.h[i] - 2) ) {								
+
+								if( ahahah.w[j] < ahahah.w[i] )
+									toDelete[i]  =  '.area[w='+(ahahah.w[j]+1)+'][h='+(ahahah.h[j]+1)+'] > .parts[b=1]';
+								else
+									toDelete[i]  =  '.area[w='+(ahahah.w[j]-1)+'][h='+(ahahah.h[j]+1)+'] > .parts[b=1]';
+
+								if( $( toDelete[i] ).length > 0 ) {
+									append  =  true;
+								}else {
+									append  =  false;
+									break;
+								}
+
+							}
+						}
+					}
 				}
 
+				if( append ) {
+					for( var i = 0; i < toDelete.length; i++) {
+						$( toDelete[i] ).remove();
+					}
+				}
 
 				if ( append ) {
 					$drop.append($e.css({ 'z-index': 100 }));
@@ -218,6 +380,12 @@
 				setTimeout( function () {
 					$e.removeClass( "animation" );
 				}, 800);
+
+				if ( d == $e ) {
+					ahahah.h = [];
+					ahahah.w = [];
+				}				
+
             });
 
         }
