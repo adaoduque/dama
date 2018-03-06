@@ -105,12 +105,16 @@
         	var height    =  this.hParts
         	var width     =  this.wParts
 			var center    =  this.center;
+			var eDama     =  this;
 			var ahahah    =  { 'h' : [], 'w' : []};
 			var d         =  '';
 
 			$('div.parts').off('mousedown').on( 'mousedown', function ( e ) {
 				ahahah.h = [];
-				ahahah.w = [];			
+				ahahah.w = [];
+
+				ahahah.h.push( parseInt( $(this).parent().attr('h') ) );
+				ahahah.w.push( parseInt( $(this).parent().attr('w') ) );
 				d        =   $( this ).css({ 'z-index' : 200 });
 
 				var type   =  d.attr("b");
@@ -145,7 +149,7 @@
 	                        	if( dLeft < left && ( dLeft + width ) < (left + width) && left - dLeft < dWidth ) {
 	                        		l  -= 1;
 	                        		if( dTop < top && ( top - dTop ) < dHeight ) {										
-										if (ahahah.h[l] != $(this).attr('h') && ahahah.w[l] != $(this).attr('w') ) {
+										if (ahahah.h[l] != parseInt( $(this).attr('h') ) && ahahah.w[l] != parseInt( $(this).attr('w') ) ) {
 											ahahah.h.push( parseInt( $(this).attr('h') ) );
 											ahahah.w.push( parseInt( $(this).attr('w') ) );
 										}
@@ -159,9 +163,9 @@
 
 	                        }else if( l > 2 && type == 2 && p.attr( "b" ) == 2 && p.attr( "h" ) == d.attr( "h" ) && p.attr( "w" ) == d.attr( "w" ) ) {
                         		if( dLeft < left && ( dLeft + width ) < (left + width) && left - dLeft < dWidth ) {
-                        			console.log("SIMMMM  2")
+                        			l  -= 1;
 	                        		if( dTop < top && ( top - dTop ) < dHeight ) {
-										if (ahahah.h[l] != $(this).attr('h') && ahahah.w[l] != $(this).attr('w') ) {
+										if (ahahah.h[l] != parseInt( $(this).attr('h') ) && ahahah.w[l] != parseInt( $(this).attr('w') ) ) {
 											ahahah.h.push( parseInt( $(this).attr('h') ) );
 											ahahah.w.push( parseInt( $(this).attr('w') ) );
 										}	                        			
@@ -172,9 +176,9 @@
                         		}                  		
                         	}else if( l > 2 && type == 1 && p.attr( "b" ) == 1 && p.attr( "h" ) == d.attr( "h" ) && p.attr( "w" ) == d.attr( "w" ) ) {
                         		if( dLeft < left && ( dLeft + width ) < (left + width) && left - dLeft < dWidth ) {
-                        			console.log("SIMMMM  2")
+                        			l  -= 1;
 	                        		if( dTop < top && ( top - dTop ) < dHeight ) {
-										if (ahahah.h[l] != $(this).attr('h') && ahahah.w[l] != $(this).attr('w') ) {
+										if (ahahah.h[l] != parseInt( $(this).attr('h') ) && ahahah.w[l] != parseInt( $(this).attr('w') ) ) {
 											ahahah.h.push( parseInt( $(this).attr('h') ) );
 											ahahah.w.push( parseInt( $(this).attr('w') ) );
 										}	                        			
@@ -199,6 +203,69 @@
 	            e.preventDefault();
 			}).off('mouseup').on( 'mouseup', function () {
 
+				var $e        =  $( this );
+				var $drop     =  $( '.bingo' );
+				var toDelete  =  { 'h' : [], 'w' : []};
+				var response  =  false;
+				var append    =  false;
+
+				var nh1       =  parseInt( $e.parent().attr('h') );
+				var nw1       =  parseInt( $e.parent().attr('w') );
+				var b         =  $e.attr( 'b' );
+				var db        =  b == 1 ? 2 : 1;
+
+				var nh2       =  parseInt( $drop.attr('h') );
+				var nw2       =  parseInt( $drop.attr('w') );
+
+				dragging      =  true;
+
+				if( $drop.length != 1 ) {
+					append = false;
+				}else if ( b == 1 && nh2 == ( nh1 + 1) && ahahah.h.length == 2 ) {				
+					if (nw2 - nw1 == 1 || nw2 - nw1 == -1 ) {
+						append  =  true;
+					}
+				} else if (b == 2 && nh2 == (nh1 - 1) && ahahah.h.length == 2 ) {
+					if (nw2 - nw1 == 1 || nw2 - nw1 == -1) {
+						append = true;
+					}
+				}else if( ahahah.h.length > 1 ) {
+					for( var i = 1; i < ahahah.h.length; i++) {
+
+						if( b == 2 ) {
+							response  =  eDama.captureB1( ahahah.h[i-1], ahahah.w[i-1], ahahah.h[i], ahahah.w[i], i);
+						}else {
+							response  =  eDama.captureB2( ahahah.h[i-1], ahahah.w[i-1], ahahah.h[i], ahahah.w[i], i);
+						}
+
+						if( typeof response == 'object' ) {
+							toDelete.h.push(response.h[0]);
+							toDelete.w.push(response.w[0]);
+							append  =  true;
+						}else {
+							append  =  false;
+							break;
+						}
+					}
+				}
+
+				if ( append ) {
+					for( var i = 0; i < toDelete.h.length; i++) {
+						var h =  toDelete.h[i];
+						var w =  toDelete.w[i];
+						$( '.area[w='+w+'][h='+h+'] > .parts[b='+db+']' ).remove();
+					}					
+					$drop.append($e.css({ 'z-index': 100 }));
+				}
+
+				$e.css({ 'z-index': 100, 'left' : '0px', 'top' : '0px' }).addClass("animation");
+      			$drop.removeClass( 'bingo' );
+				
+				setTimeout( function () {
+					$e.removeClass( "animation" );
+				}, 500);
+
+				/*
 				var $e = $(this);
 				var toDelete  =  [];
 				console.log( ahahah );
@@ -275,13 +342,14 @@
 
 							var j = i-1;
 
-							console.log( "SUM: " + ahahah.h[i] + " " + (ahahah.h[j]+2) );
-
 							if( ahahah.h[i] == (ahahah.h[j]+2) ) {
-								if( ahahah.w[j] < ahahah.w[i] )
+								if( ahahah.w[j] < ahahah.w[i] ) {
 									toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
-								else
+									console.log( "MENORRRR" );
+								}else {
 									toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
+									console.log( "MAIORRRRR" );
+								}
 
 								if( $( toDelete[i] ).length > 0 ) {
 									append  =  true;
@@ -313,13 +381,14 @@
 
 					for( var i = 0; i < ahahah.h.length; i++) {
 						if( ahahah.h[i] == (ih-2) && i == 0 ) {
+
 							if( iw < ahahah.w[i] ){
 								toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
-								//console.log("MENOR");
+								console.log("MENOR");
 							}
 							else{
 								toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
-								//console.log("MAIOR");
+								console.log('.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]');
 							}
 
 							if( $( toDelete[i] ).length > 0 ) {
@@ -333,10 +402,13 @@
 							var j = i-1;
 
 							if( ahahah.h[i] == (ahahah.h[j]-2) ) {
-								if( ahahah.w[j] < ahahah.w[i] )
+								if( ahahah.w[j] < ahahah.w[i] ) {
 									toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
-								else
+									//console.log("MENOR");
+								}else {
 									toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
+									//console.log("MAIOR");
+								}
 
 								if( $( toDelete[i] ).length > 0 ) {
 									append  =  true;
@@ -363,6 +435,31 @@
 					}
 				}
 
+				//var l = ahahah.h.length -1;
+
+				//if( ahahah.h[l] != nih || ahahah.w[l] != niw ) {
+				//	append = false;
+				//}
+
+				for (var i = 0; i < ahahah.h.length -1; i++) {
+					if( i > 0 ) {
+
+					}else {
+						if( b == 2 ) {
+
+							if( ih < nih && iw < niw ) {
+
+							}
+
+						}
+
+ih
+iw
+
+					}
+				}
+
+
 				if( append ) {
 					for( var i = 0; i < toDelete.length; i++) {
 						$( toDelete[i] ).remove();
@@ -384,9 +481,203 @@
 				if ( d == $e ) {
 					ahahah.h = [];
 					ahahah.w = [];
-				}				
+				}
+				*/		
 
             });
+
+        },
+        captureB1 : function ( n1, w1, n2, w2, i ) {
+
+        	//Indice to delete
+        	var delh    =  0;
+        	var delw    =  0;
+        	var exists  =  false;
+
+
+        	if( n1-2 == n2 && w1-2 == w2 ) {
+	        	/**
+	        	 * Capturando diagonal esquerda
+	        	 */
+
+        		//Determine position for capture B1
+	        	delh   =  (n1-1);
+	        	delw   =  (w1-1);
+
+	        	//Check if B1 exists in corrdenade
+        		exists =  this.findCapture(delw, delh, 1);
+
+        		//Exists ?
+        		if( exists ) {
+        			return { 'h' : [delh], 'w' : [delw]};
+        		}else {
+        			return false;
+        		}
+
+        	}else if( n1-2 == n2 && w1+2 == w2 ) {
+	        	/**
+	        	 * Capturando diagonal direita
+	        	 */
+
+        		//Determine position for capture B1
+	        	delh   =  (n1-1);
+	        	delw   =  (w1+1);
+
+	        	//Check if B1 exists in corrdenade
+        		exists =  this.findCapture(delw, delh, 1);
+
+        		//Exists ?
+        		if( exists ) {
+        			return { 'h' : [delh], 'w' : [delw]};
+        		}else {
+        			return false;
+        		}
+        		
+        	}else if( i > 2 ) {
+
+        		if( n1+2 == n2 && w1-2 == w2 ) {
+		        	/**
+		        	 * Capturando diagonal esquerda (Sequencial)
+		        	 */
+
+	        		//Determine position for capture B1
+		        	delh   =  (n1+1);
+		        	delw   =  (w1-1);
+
+		        	//Check if B1 exists in corrdenade
+	        		exists =  this.findCapture(delw, delh, 1);
+
+	        		//Exists ?
+	        		if( exists ) {
+	        			return { 'h' : [delh], 'w' : [delw]};
+	        		}else {
+	        			return false;
+	        		}
+
+        		}else if( n1+2 == n2 && w1+2 == w2 ) {
+	        		/**
+		        	 * Capturando diagonal esquerda -> direita (Sequencial de cima para baixo)
+		        	 */        			
+	        		//Determine position for capture B1
+		        	delh   =  (n1+1);
+		        	delw   =  (w1+1);
+
+		        	//Check if B1 exists in corrdenade
+	        		exists =  this.findCapture(delw, delh, 1);
+
+	        		//Exists ?
+	        		if( exists ) {
+	        			return { 'h' : [delh], 'w' : [delw]};
+	        		}else {
+	        			return false;
+	        		}
+
+        		}else {
+        			return false;
+        		}
+
+        	}else {
+
+        		return false;
+
+        	}
+
+        }, 
+        captureB2 : function ( n1, w1, n2, w2, i ) {
+
+        	//Indice to delete
+        	var delh    =  0;
+        	var delw    =  0;
+        	var exists  =  false;
+
+    		if( n1+2 == n2 && w1-2 == w2 ) {
+	        	/**
+	        	 * Capturando diagonal esquerda
+	        	 */
+
+        		//Determine position for capture B2
+	        	delh   =  (n1+1);
+	        	delw   =  (w1-1);
+
+	        	//Check if B2 exists in corrdenade
+        		exists =  this.findCapture(delw, delh, 2);
+
+        		//Exists ?
+        		if( exists ) {
+        			return { 'h' : [delh], 'w' : [delw]};
+        		}else {
+        			return false;
+        		}
+
+    		}else if( n1+2 == n2 && w1+2 == w2 ) {
+        		/**
+	        	 * Capturando diagonal direita
+	        	 */        			
+        		//Determine position for capture B2
+	        	delh   =  (n1+1);
+	        	delw   =  (w1+1);
+
+	        	//Check if B2 exists in corrdenade
+        		exists =  this.findCapture(delw, delh, 2);
+
+        		//Exists ?
+        		if( exists ) {
+        			return { 'h' : [delh], 'w' : [delw]};
+        		}else {
+        			return false;
+        		}
+
+        	}else if( i > 2 ) {
+
+	        	if( n1-2 == n2 && w1-2 == w2 ) {
+		        	/**
+		        	 * Capturando diagonal esquerda
+		        	 */
+
+	        		//Determine position for capture B1
+		        	delh   =  (n1-1);
+		        	delw   =  (w1-1);
+
+		        	//Check if B1 exists in corrdenade
+	        		exists =  this.findCapture(delw, delh, 2);
+
+	        		//Exists ?
+	        		if( exists ) {
+	        			return { 'h' : [delh], 'w' : [delw]};
+	        		}else {
+	        			return false;
+	        		}
+
+	        	}else if( n1-2 == n2 && w1+2 == w2 ) {
+		        	/**
+		        	 * Capturando diagonal direita
+		        	 */
+
+	        		//Determine position for capture B1
+		        	delh   =  (n1-1);
+		        	delw   =  (w1+1);
+
+		        	//Check if B1 exists in corrdenade
+	        		exists =  this.findCapture(delw, delh, 2);
+
+	        		//Exists ?
+	        		if( exists ) {
+	        			return { 'h' : [delh], 'w' : [delw]};
+	        		}else {
+	        			return false;
+	        		}
+	        		
+	        	}else {
+    				return false;
+    			}
+
+    		}else {
+    			return false;
+    		}
+        },
+        findCapture :  function ( w, h, bn ) {
+
+        	return $( '.area[w='+w+'][h='+h+'] > .parts[b='+bn+']' ).length == 1 ? true : false;
 
         }
 
