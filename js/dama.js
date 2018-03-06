@@ -5,7 +5,8 @@
         this.settings  =  settings;
         //console.log( this.settings );
         this.$element.addClass("container");
-        this.$element.width( this.$element.height() )
+        this.$element.width( this.$element.height() );
+        this.parts     =  0;
         this.wParts    =  0;
 		this.hParts    =  0;
 		this.wGrid     =  [];
@@ -33,6 +34,7 @@
         	var width    =  0;
         	var height   =  0;
         	var tParts   =  parts * parts;
+        	this.parts   =  parts;
         	this.wParts  =  this.$element.width() / parts;
         	this.hParts  =  this.$element.height() / parts;
 
@@ -87,11 +89,11 @@
 
         	this.$element.find( 'div.area2' ).each( function () {
         		if( nParts > i ) {
-        			var $parts  =  $( '<div />' ).addClass( 'parts' ).attr({ 'b' : 1, 'locked' : true }).css({ 'z-index' : 100, 'margin-top' : center , 'border-color' : colorOne, 'background-color' : colorOne, 'border-radius' : radius, 'height' : height - minor, 'width' : height - minor });
+        			var $parts  =  $( '<div />' ).addClass( 'parts' ).attr({ 'b' : 1, 'isDama' : false, 'locked' : true }).css({ 'z-index' : 100, 'margin-top' : center , 'border-color' : colorOne, 'background-color' : colorOne, 'border-radius' : radius, 'height' : height - minor, 'width' : height - minor });
         			$( this ).append( $parts );
         		}else {
         			if( j >= ignore ) {
-	        			var $parts  =  $( '<div />' ).addClass( 'parts' ).attr({ 'b' : 2, 'locked' : true }).css({ 'z-index' : 100, 'margin-top' : center , 'border-color' : colorTwo, 'background-color' : colorTwo, 'border-radius' : radius, 'height' : height - minor, 'width' : height - minor });
+	        			var $parts  =  $( '<div />' ).addClass( 'parts' ).attr({ 'b' : 2, 'isDama' : false, 'locked' : true }).css({ 'z-index' : 100, 'margin-top' : center , 'border-color' : colorTwo, 'background-color' : colorTwo, 'border-radius' : radius, 'height' : height - minor, 'width' : height - minor });
 	        			$( this ).append( $parts );
         			}
         			j++;
@@ -100,6 +102,7 @@
         	});
         },
         dragDrop : function () {
+        	var parts     =  this.parts;
         	var $element  =  this.$element;
         	var dragging  =  this.dragging;
         	var height    =  this.hParts
@@ -254,9 +257,24 @@
 						var h =  toDelete.h[i];
 						var w =  toDelete.w[i];
 						$( '.area[w='+w+'][h='+h+'] > .parts[b='+db+']' ).remove();
-					}					
+					}
+
+					console.log( $e.attr( 'isdama' ) );
+
+					//Checks if is Dama
+					if( b == 1 && nh2 == parts && $e.attr( 'isdama' ) == 'false' ) {
+						$e.addClass( 'dama' ).attr({ 'isdama' : true });
+					}else if( b == 2 && nh2 == 1 && $e.attr( 'isdama' ) == 'false' ) {
+						$e.addClass( 'dama' ).attr({ 'isdama' : true });
+					}
+
+					console.log( nh2 );
+					console.log( parts );
+
 					$drop.append($e.css({ 'z-index': 100 }));
 				}
+
+
 
 				$e.css({ 'z-index': 100, 'left' : '0px', 'top' : '0px' }).addClass("animation");
       			$drop.removeClass( 'bingo' );

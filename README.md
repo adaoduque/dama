@@ -8,7 +8,7 @@ Um game de dama controlado por uma inteligência artificial.<br/>
 > :white_check_mark: Suportar drag and drop das peças <br/>
 > :white_check_mark: Função de comer a peça do oponente (Comer para frente) <br/>
 > :white_check_mark: Função de comer múltiplas peças do oponente (Se possível) <br/>
-> :no_entry_sign: Suportar damas (Quando a peça chegar na primeira linha de casas do oponente) <br/>
+> :white_check_mark: Suportar damas (Quando a peça chegar na primeira linha de casas do oponente) <br/>
 > :no_entry_sign: Damas andam qualquer quantidade de casas (Linha reta) <br/>
 > :no_entry_sign: Damas comem peças <br/>
 > :no_entry_sign: Adicionar inteligência Artificial para jogar <br/>

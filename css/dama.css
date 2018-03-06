@@ -41,3 +41,7 @@ html, body {
 	-webkit-transition:top .7s, left .7s; 
 	-o-transition: top .7s, left .7s;
 }
+
+.dama {
+	background-color: #39ef0b !important;
+}
