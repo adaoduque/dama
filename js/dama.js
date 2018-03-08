@@ -207,6 +207,7 @@
 			}).off('mouseup').on( 'mouseup', function () {
 
 				var $e        =  $( this );
+				var isDama    =  $e.attr( 'isdama' ) == 'false' ? false : true;
 				var $drop     =  $( '.bingo' );
 				var toDelete  =  { 'h' : [], 'w' : []};
 				var response  =  false;
@@ -224,15 +225,15 @@
 
 				if( $drop.length != 1 ) {
 					append = false;
-				}else if ( b == 1 && nh2 == ( nh1 + 1) && ahahah.h.length == 2 ) {				
+				}else if ( b == 1 && nh2 == ( nh1 + 1) && ahahah.h.length == 2 && !isDama ) {				
 					if (nw2 - nw1 == 1 || nw2 - nw1 == -1 ) {
 						append  =  true;
 					}
-				} else if (b == 2 && nh2 == (nh1 - 1) && ahahah.h.length == 2 ) {
+				} else if (b == 2 && nh2 == (nh1 - 1) && ahahah.h.length == 2 && !isDama ) {
 					if (nw2 - nw1 == 1 || nw2 - nw1 == -1) {
 						append = true;
 					}
-				}else if( ahahah.h.length > 1 ) {
+				}else if( ahahah.h.length > 1 && !isDama ) {
 					for( var i = 1; i < ahahah.h.length; i++) {
 
 						if( b == 2 ) {
@@ -250,6 +251,17 @@
 							break;
 						}
 					}
+				}else if( isDama ) {
+
+					response  =  eDama.moveDama( ahahah, b );
+
+					if( typeof response == 'object' ) {
+						toDelete  =  response;
+						append    =  true;
+					}else {
+						append  =  false;
+					}					
+
 				}
 
 				if ( append ) {
@@ -259,7 +271,7 @@
 						$( '.area[w='+w+'][h='+h+'] > .parts[b='+db+']' ).remove();
 					}
 
-					console.log( $e.attr( 'isdama' ) );
+					
 
 					//Checks if is Dama
 					if( b == 1 && nh2 == parts && $e.attr( 'isdama' ) == 'false' ) {
@@ -267,9 +279,6 @@
 					}else if( b == 2 && nh2 == 1 && $e.attr( 'isdama' ) == 'false' ) {
 						$e.addClass( 'dama' ).attr({ 'isdama' : true });
 					}
-
-					console.log( nh2 );
-					console.log( parts );
 
 					$drop.append($e.css({ 'z-index': 100 }));
 				}
@@ -283,226 +292,46 @@
 					$e.removeClass( "animation" );
 				}, 500);
 
-				/*
-				var $e = $(this);
-				var toDelete  =  [];
-				console.log( ahahah );
-				//console.log( ahahah.h.filter( onlyUnique ) );
-				//console.log(ahahah.w.filter(onlyUnique));
-
-				var $drop   =  $('.bingo');
-				var append  =  false;
-				
-
-				var ih   =  parseInt( $e.parent().attr('h') );
-				var iw   =  parseInt( $e.parent().attr('w') );
-				var b    =  $e.attr( 'b' );
-
-				var nih      =  parseInt( $drop.attr('h') );
-				var niw      =  parseInt( $drop.attr('w') );
-
-				//console.log("IH: " + ih);
-				//console.log("IW: " + iw);
-
-				//console.log("NIH: " + nih);
-				//console.log("NIW: " + niw);
-
-
-				if ( b == 1 && nih == ( ih + 1) && ahahah.h.length <= 2 ) {				
-					if (niw - iw == 1 || niw - iw == -1 ) {
-						append  =  true;
-					}
-				} else if (b == 2 && nih == (ih - 1)  && ahahah.h.length <= 2) {
-					if (niw - iw == 1 || niw - iw == -1) {
-						append = true;
-					}
-				}else if( b == 2 && nih == (ih - 2)  && ahahah.h.length <= 2 ) {
-
-					if( iw < niw )
-						var $div =  $( '.area[w='+(niw-1)+'][h='+(nih+1)+'] > .parts[b=1]' );
-					else
-						var $div =  $( '.area[w='+(niw+1)+'][h='+(nih+1)+'] > .parts[b=1]' );
-
-					if( $div.length > 0 ) {
-						$div.remove();
-						append  =  true;
-					}
-				}else if( b == 1 && nih == (ih + 2) && ahahah.h.length <= 2 ) {
-
-					if( iw < niw )
-						var $div =  $( '.area[w='+(niw-1)+'][h='+(nih-1)+'] > .parts[b=2]' );
-					else
-						var $div =  $( '.area[w='+(niw+1)+'][h='+(nih-1)+'] > .parts[b=2]' );
-
-					if( $div.length > 0 ) {
-						$div.remove();
-						append  =  true;
-					}
-				
-				}else if( b == 1 ) {
-					
-
-					for( var i = 0; i < ahahah.h.length; i++) {
-						if( ahahah.h[i] == (ih+2) && i == 0 ) {
-							if( iw < ahahah.w[i] )
-								toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
-							else
-								toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
-
-							if( $( toDelete[i] ).length > 0 ) {
-								append  =  true;
-							}else {
-								append  =  false;
-								break;
-							}
-
-						}else {
-
-							var j = i-1;
-
-							if( ahahah.h[i] == (ahahah.h[j]+2) ) {
-								if( ahahah.w[j] < ahahah.w[i] ) {
-									toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
-									console.log( "MENORRRR" );
-								}else {
-									toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=2]';
-									console.log( "MAIORRRRR" );
-								}
-
-								if( $( toDelete[i] ).length > 0 ) {
-									append  =  true;
-								}else {
-									append  =  false;
-									break;
-								}
-							}else if( ahahah.h[j] == (ahahah.h[i] + 2) ) {								
-
-								if( ahahah.w[j] < ahahah.w[i] )
-									toDelete[i]  =  '.area[w='+(ahahah.w[j]+1)+'][h='+(ahahah.h[j]-1)+'] > .parts[b=2]';
-								else
-									toDelete[i]  =  '.area[w='+(ahahah.w[j]-1)+'][h='+(ahahah.h[j]-1)+'] > .parts[b=2]';
-
-								if( $( toDelete[i] ).length > 0 ) {
-									append  =  true;
-								}else {
-									append  =  false;
-									break;
-								}
-
-							}
-
-						}
-
-					}
-
-				}else if( b == 2 ) {			
-
-					for( var i = 0; i < ahahah.h.length; i++) {
-						if( ahahah.h[i] == (ih-2) && i == 0 ) {
-
-							if( iw < ahahah.w[i] ){
-								toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
-								console.log("MENOR");
-							}
-							else{
-								toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
-								console.log('.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]');
-							}
-
-							if( $( toDelete[i] ).length > 0 ) {
-								append  =  true;
-							}else {
-								append  =  false;
-								//console.log("NÃOOOO" + ( '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]-1)+'] > .parts[b=1]' ));
-								break;
-							}
-						}else {
-							var j = i-1;
-
-							if( ahahah.h[i] == (ahahah.h[j]-2) ) {
-								if( ahahah.w[j] < ahahah.w[i] ) {
-									toDelete[i]  =  '.area[w='+(ahahah.w[i]-1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
-									//console.log("MENOR");
-								}else {
-									toDelete[i]  =  '.area[w='+(ahahah.w[i]+1)+'][h='+(ahahah.h[i]+1)+'] > .parts[b=1]';
-									//console.log("MAIOR");
-								}
-
-								if( $( toDelete[i] ).length > 0 ) {
-									append  =  true;
-								}else {
-									append  =  false;
-									break;
-								}
-							}else if( ahahah.h[j] == (ahahah.h[i] - 2) ) {								
-
-								if( ahahah.w[j] < ahahah.w[i] )
-									toDelete[i]  =  '.area[w='+(ahahah.w[j]+1)+'][h='+(ahahah.h[j]+1)+'] > .parts[b=1]';
-								else
-									toDelete[i]  =  '.area[w='+(ahahah.w[j]-1)+'][h='+(ahahah.h[j]+1)+'] > .parts[b=1]';
-
-								if( $( toDelete[i] ).length > 0 ) {
-									append  =  true;
-								}else {
-									append  =  false;
-									break;
-								}
-
-							}
-						}
-					}
-				}
-
-				//var l = ahahah.h.length -1;
-
-				//if( ahahah.h[l] != nih || ahahah.w[l] != niw ) {
-				//	append = false;
-				//}
-
-				for (var i = 0; i < ahahah.h.length -1; i++) {
-					if( i > 0 ) {
-
-					}else {
-						if( b == 2 ) {
-
-							if( ih < nih && iw < niw ) {
-
-							}
-
-						}
-
-ih
-iw
-
-					}
-				}
-
-
-				if( append ) {
-					for( var i = 0; i < toDelete.length; i++) {
-						$( toDelete[i] ).remove();
-					}
-				}
-
-				if ( append ) {
-					$drop.append($e.css({ 'z-index': 100 }));
-				}
-            	
-				$e.css({ 'left' : '0px', 'top' : '0px' }).addClass("animation");
-      			$drop.removeClass( 'bingo' );
-				dragging  =  true;
-				
-				setTimeout( function () {
-					$e.removeClass( "animation" );
-				}, 800);
-
-				if ( d == $e ) {
-					ahahah.h = [];
-					ahahah.w = [];
-				}
-				*/		
-
             });
+
+        },
+        moveDama : function ( arr, bn ) {
+
+        	var b    =  bn == 1 ? 2 : 1;
+        	var response = false;
+        	var del  =  {h: [], w : []};
+
+			for( var i = 1; i < arr.h.length; i++) {
+				var h1  =  arr.h[i-1];
+				var w1  =  arr.w[i-1];
+				var h2  =  arr.h[i];
+				var w2  =  arr.w[i];
+
+				if( h1 - h2 == 1 || h2 - h1 == 1 ) {
+					continue;
+				}else if( h1 == h2 || this.findCapture( w2, h2, bn ) ) {
+					return false;
+				}else {
+					if( bn == 2 ) {
+						response  =  this.captureB1( arr.h[i-1], arr.w[i-1], arr.h[i], arr.w[i], 3);
+					}else {
+						response  =  this.captureB2( arr.h[i-1], arr.w[i-1], arr.h[i], arr.w[i], 3);
+					}
+
+					if( typeof response == 'object' ) {
+						del.h.push(response.h[0]);
+						del.w.push(response.w[0]);
+						continue
+					}else {
+						return false;
+						break;
+					}
+				}
+			}
+
+			console.log( del );
+
+			return del;
 
         },
         captureB1 : function ( n1, w1, n2, w2, i ) {
